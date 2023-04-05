@@ -37,7 +37,7 @@ function Start() {
                 Individual
               </button>
               <button className="btn-secondary" onClick={navigateToCorp}>
-                Corporation
+                Corporate
               </button>
         </div>
 

@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import { Stepper, Step, StepLabel } from "@mui/material";
 import Navbar from "../../components/header/Navbar";
 import Footer from "../../components/footer/Footer";
+import Confirmation from "../confirmation/Confirmation";
+import { Routes, Route, useNavigate } from "react-router-dom";
 
 function Individual() {
 
@@ -51,7 +53,11 @@ function Individual() {
   const [errPanCard, setErrPanCard] = useState(false);
   const [panCard, setPanCard] = useState(null);
   const [errAadharNo, setErrAadharNo] = useState('');
+  const [validAadharNo, setValidAadharNo] = useState(false)
   const [aadharNo, setAadharNo] = useState('');
+  const [aadharOtp, setAadharOtp] = useState('')
+  const [errAadharOtp, setErrAadharOtp] = useState('');
+  const [validAadharOtp, setValidAadharOtp] = useState(false);
   const [errAadharFront, setErrAadharFront] = useState('');
   const [aadharfront, setAadharFront] = useState(null);
   const [errAadharBack, setErrAadharBack] = useState('');
@@ -358,13 +364,38 @@ function Individual() {
     if(readhar.test(aadharNo)){
       // this is a valid aadhar number
       setErrAadharNo('')
+      setValidAadharNo(true)
     }
     else{
       // invalid aadhar number
       setErrAadharNo("Please enter a valid Aadhar Card Number")
+      setValidAadharNo(false)
     }
   }
   
+
+
+  const handleAadharOTPChange = (e) =>{
+    setAadharOtp(e.target.value);
+    if(aadharOtp.length != 5){
+      setErrAadharOtp("Please Enter a valid OTP");
+      setValidAadharOtp(false)
+    }
+    else{
+      setErrAadharOtp('');
+      setValidAadharOtp(true)
+    }
+    // console.log(validPhoneOtp);
+  }
+
+
+  const handleSubmitOtpAadhar = (e) => {
+    // console.log("hi");
+    e.preventDefault();
+    // Call your backend API here to verify the OTP sent to the provided phone number
+  };
+
+
 
   const onAadharFrontChange = (event) => {
     if (event.target.files && event.target.files[0]) {
@@ -447,6 +478,12 @@ function Individual() {
     setStep(step + 1);
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    navigateConfirmation();
+
+  }
+
   
 
 
@@ -524,6 +561,13 @@ function Individual() {
 
 
 
+  const navigate = useNavigate();
+  const navigateConfirmation = () => {
+    // navigate to /confrimation
+    navigate("/confirmation");
+};
+
+
 
 
 
@@ -590,7 +634,7 @@ function Individual() {
                         value={phoneOTP}
                         onChange={handlePhoneOTPChange}
                       />
-                      <div className="error">{errPhoneOTP}</div>
+                      <div className="error"  >{errPhoneOTP}</div>
                       <div className="button-container">
                         <button onClick={handleSubmitOtpPhone} disabled={!validPhoneOtp}>Verify</button>
                       </div>
@@ -635,14 +679,14 @@ function Individual() {
               </div>
 
               {
-                messageOne && <div className="error">{messageOne}</div>
+                messageOne && <div className="error" style={{paddingLeft: "20px"}}>{messageOne}</div>
               }
 
               
 
               
-              <div className="button-container">
-                <button type = "submit" onClick={handleNext} disabled={!oneFilled}>Next</button>
+              <div className="button-container" style={{padding: "20px"}} >
+                <button type = "submit" onClick={handleNext} disabled={!oneFilled} >Next</button>
               </div>
             </>
           )}
@@ -738,11 +782,11 @@ function Individual() {
               </div>
 
               {
-                messageTwo && <div className="error">{messageTwo}</div>
+                messageTwo && <div className="error" style={{paddingLeft: "20px"}}>{messageTwo}</div>
               }
 
 
-              <div className="button-container">
+              <div className="button-container" style={{padding: "20px"}} >
                 <button onClick={handleBack}>Previous</button>
                 <button onClick={handleNext} disabled={!twofilled}>Next</button>
               </div>
@@ -808,10 +852,10 @@ function Individual() {
               </div>
 
               {
-                messageThree && <div className="error">{messageThree}</div>
+                messageThree && <div className="error" style={{paddingLeft: "20px"}}>{messageThree}</div>
               }
 
-              <div className="button-container">
+              <div className="button-container" style={{padding: "20px"}} >
                 <button onClick={handleBack}>Previous</button>
                 <button onClick={handleNext} disabled={!threeFilled}>Next</button>
               </div>
@@ -861,6 +905,27 @@ function Individual() {
                     onChange={onAadharNoChange}
                   />
                   <div className="error">{errAadharNo}</div>
+
+
+
+                  {
+                    validAadharNo &&
+                    <div>
+                      <div className="error">OTP has been sent to your linked mobile number</div>
+                      <label className="label">Enter OTP <span className="star">*</span></label>
+                      <input
+                        type="text"
+                        name = "AadharOtp"
+                        required
+                        value={aadharOtp}
+                        onChange={handleAadharOTPChange}
+                      />
+                      <div className="error">{errAadharOtp}</div>
+                      <div className="button-container">
+                        <button onClick={handleSubmitOtpAadhar} disabled={!validAadharOtp}>Verify</button>
+                      </div>
+                    </div>
+                  }
                       
                   
                   <label className="label"> Aadhar Card Front <span className="star">*</span></label>
@@ -905,10 +970,10 @@ function Individual() {
               </div>
 
               {
-                messageFour && <div className="error">{messageFour}</div>
+                messageFour && <div className="error" style={{paddingLeft: "20px"}}>{messageFour}</div>
               }
 
-              <div className="button-container">
+              <div className="button-container" style={{padding: "20px"}} >
                 <button onClick={handleBack}>Previous</button>
                 <button onClick={handleNext} disabled={!fourFilled}>Next</button>
               </div>
@@ -969,77 +1034,24 @@ function Individual() {
               </div>
 
               {
-                messageFive && <div className="error">{messageFive}</div>
+                messageFive && <div className="error" style={{padding: "20px"}}>{messageFive}</div>
               }
 
-              <div className="button-container">
+              <div className="button-container" style={{padding: "20px"}} >
                 <button onClick={handleBack}>Previous</button>
-                <button onClick={(e) => e.preventDefault()} disabled={!fiveFilled}>Submit</button>
+                <button onClick={handleSubmit} disabled={!fiveFilled}>Submit</button>
               </div>
             </>
           )}
 
-        
+<Footer/>
         </form>
         
       </div>
-      <Footer/>
+      
     </div>
     
   );
 }
 
 export default Individual;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
