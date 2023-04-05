@@ -17,8 +17,6 @@
     display: flex;
     justify-content: center;
     width: 180px;
-    animation: slide-in 1.7s ease-in-out;
-
   }
   
   .gif{
@@ -26,16 +24,7 @@
     margin-right: 20px;
     width: 500px;
     height: 500px;
-    animation: slide-in 1.5s ease-in-out;
   }
 
-  @keyframes slide-in {
-    from {
-      transform: translateX(100%);
-    }
-    to {
-      transform: translateX(0);
-    }
-  }
-  
+
   

@@ -45,6 +45,7 @@ function Individual() {
   const [errPostal, setErrPostal] = useState('');
   const [postal, setPostal] = useState('');
   const [threeFilled, setThreeFilled] = useState(false);
+  const [validPanNo, setValidPanNo] = useState(false);
   const [errPanNo, setErrPanNo] = useState('');
   const [panNo, setPanNo] = useState('');
   const [errPanCard, setErrPanCard] = useState(false);
@@ -66,12 +67,26 @@ function Individual() {
   const [messageTwo, setMessageTwo] = useState('');
   const [messageThree, setMessageThree] = useState('');
   const [messageFour, setMessageFour] = useState('');
+  const [messageFive, setMessageFive] = useState('');
+
+ 
+
 
   
   
   const defaultData = () => {
-    setGender("Male");
-    setMarital("UnMarried");
+    if(!gender){
+      setGender("Male");
+    }
+    if(!marital){
+      setMarital("UnMarried");
+    }
+    if(!account){
+      setAccount("Savings");
+    }
+    if(!dob){
+      setDob("00/00/0000");
+    }
   }
   
   
@@ -90,7 +105,7 @@ function Individual() {
     if(!e.target.value){
       setErrPhone("Phone is required")
     }
-    else if(phone.length != 9){
+    else if(e.target.value.length != 10){
       console.log("Please Enter Valid phone number")
       setErrPhone("Invalid Phone Number")
     }
@@ -104,29 +119,7 @@ function Individual() {
 
   const handlesendOtpPhone = async () => {
     setPhoneOtpVisible(true);
-    try {
-      // send the phone number to the backend
-      const response = await fetch('/api/sendOtpPhone', {
-        method: 'POST',
-        body: JSON.stringify({ phone }),
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-  
-      // check if the request was successful
-      if (!response.ok) {
-        throw new Error('Failed to send OTP to phone number');
-      }
-  
-      // handle the response from the backend
-      const data = await response.json();
-      console.log(data); // do something with the response data, e.g. show a success message
-    } catch (error) {
-      console.error(error);
-      // handle the error, e.g. show an error message to the user
-    }
-  };
+  }
 
 
   const handlePhoneOTPChange = (e) =>{
@@ -146,10 +139,6 @@ function Individual() {
   const handleSubmitOtpPhone = (e) => {
     // console.log("hi");
     e.preventDefault();
-    const data = {
-      phone: phone,
-      otp: phoneOTP,
-    };
     // Call your backend API here to verify the OTP sent to the provided phone number
   };
 
@@ -319,20 +308,28 @@ function Individual() {
 
 
   const handlePanNoChange = (e) => {
+    console.log("pan changed!!!")
     setPanNo(e.target.value);
-    if(!e.target.value){
-      setErrPanNo("Pan Number is required");
-    }
-    else{
+    // let repan =  new RegExp(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/);
+    let repan =  new RegExp(/^[A-Z]{5}[0-9]{4}$/);
+    if(repan.test(panNo)){
+      // this is a valid pan card numer
       setErrPanNo('');
     }
+    else{
+      // invalid pan card number
+      setErrPanNo("Please enter a valid Pan Card Number")
+    }
+    
   }
 
 
   const onPanCardChange = (event) => {
     const fileSize = event.target.files[0].size;
+    console.log(fileSize);
     if(fileSize > 500000){
       setErrPanCard("File size should be less than 500kb")
+      console.log(panCard)
       console.log("hello")
     }
     
@@ -352,29 +349,19 @@ function Individual() {
     
   };
 
-  // const onPanCardChange = (event) => {
-  //   if (event.target.files && event.target.files[0]) {
-  //     setPanCard(URL.createObjectURL(event.target.files[0]));
-  //   }
-  //   if(!event.target.value){
-  //     setErrPanCard("Pan Card is required");
-  //   }
-  //   else{
-  //     setErrPanCard('')
-  //   }
-  // };
+ 
 
 
   const onAadharNoChange = (e) => {
     setAadharNo(e.target.value);
-    if(!e.target.value){
-      setErrAadharNo("Aadhar Number is required");
-    }
-    else if(aadharNo.length>11){
-      setErrAadharNo("Invalid Aadhar Number")
+    let readhar = new RegExp(/^[2-9]{1}[0-9]{3}[0-9]{4}[0-9]{3}$/);
+    if(readhar.test(aadharNo)){
+      // this is a valid aadhar number
+      setErrAadharNo('')
     }
     else{
-      setErrAadharNo('');
+      // invalid aadhar number
+      setErrAadharNo("Please enter a valid Aadhar Card Number")
     }
   }
   
@@ -460,9 +447,7 @@ function Individual() {
     setStep(step + 1);
   };
 
-  const individual = {firstName, middleName, lastName, email, dob, gender, marital, 
-    phone, address, city, state, country, postal, panNo, panCard, aadharNo, aadharfront, aadharback, photo, sign, account}
-  console.log(individual);
+  
 
 
   
@@ -494,19 +479,34 @@ function Individual() {
 
         if (address && city && state && country && postal) {
           setThreeFilled(true);
-        } else {
+          setMessageThree('');
+        } 
+        else {
+          if(threeFilled == false){
+            setMessageThree("Please fill all forms")
+          }
           setThreeFilled(false);
         }
 
         if (panNo && panCard && aadharNo && aadharfront && aadharback) {
           setFourFilled(true);
-        } else {
+          setMessageFour('');
+        } 
+        else {
+          if(fourFilled == false){
+            setMessageFour("Please fill all forms")
+          }
           setFourFilled(false);
         }
 
         if (phone && sign && account) {
           setFiveFilled(true);
-        } else {
+          setMessageFive('')
+        } 
+        else {
+          if(fiveFilled == false){
+            setMessageFive("Please fill all forms")
+          }
           setFiveFilled(false);
         }
   });
@@ -517,6 +517,9 @@ function Individual() {
 
 
 
+
+  const individual = {firstName, middleName, lastName, email, dob, gender, marital, phone, address, city, state, country, postal, panNo, panCard, aadharNo, aadharfront, aadharback, photo, sign, account}
+  console.log(individual);
 
 
 
@@ -582,6 +585,7 @@ function Individual() {
                       <label className="label">Enter OTP <span className="star">*</span></label>
                       <input
                         type="text"
+                        name = "phoneOTP"
                         required
                         value={phoneOTP}
                         onChange={handlePhoneOTPChange}
@@ -803,6 +807,10 @@ function Individual() {
 
               </div>
 
+              {
+                messageThree && <div className="error">{messageThree}</div>
+              }
+
               <div className="button-container">
                 <button onClick={handleBack}>Previous</button>
                 <button onClick={handleNext} disabled={!threeFilled}>Next</button>
@@ -827,6 +835,7 @@ function Individual() {
                       
                   
                   <label className="label">Pan Card <span className="star">*</span></label>
+                  <div className="error">File size should be less than 500kb</div>
                   <input
                     type="file"
                     required
@@ -855,6 +864,7 @@ function Individual() {
                       
                   
                   <label className="label"> Aadhar Card Front <span className="star">*</span></label>
+                  <div className="error">File size should be less than 500kb</div>
                   <input
                     type="file"
                     required
@@ -874,6 +884,7 @@ function Individual() {
                   
       
                   <label className="label"> Aadhar Card Back <span className="star">*</span></label>
+                  <div className="error">File size should be less than 500kb</div>
                   <input
                     type="file"
                     required
@@ -893,6 +904,10 @@ function Individual() {
                 
               </div>
 
+              {
+                messageFour && <div className="error">{messageFour}</div>
+              }
+
               <div className="button-container">
                 <button onClick={handleBack}>Previous</button>
                 <button onClick={handleNext} disabled={!fourFilled}>Next</button>
@@ -906,6 +921,7 @@ function Individual() {
 
               <div className="smile">
                   <label className="label">Your Photo <span className="star">*</span></label>
+                  <div className="error">File size should be less than 500kb</div>
                   <input
                     type="file"
                     required
@@ -952,6 +968,10 @@ function Individual() {
 
               </div>
 
+              {
+                messageFive && <div className="error">{messageFive}</div>
+              }
+
               <div className="button-container">
                 <button onClick={handleBack}>Previous</button>
                 <button onClick={(e) => e.preventDefault()} disabled={!fiveFilled}>Submit</button>
@@ -961,10 +981,11 @@ function Individual() {
 
         
         </form>
-        <Footer/>
+        
       </div>
-      
+      <Footer/>
     </div>
+    
   );
 }
 
